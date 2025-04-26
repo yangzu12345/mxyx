@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发展方向 - 森林单木目标检测</title>
+    <style>
+        body {
+            background-color: #e6f3ff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 导航栏样式 */
+        /* 导航栏样式 */
+        .nav-bar {
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--background);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 内容容器样式 */
+        .content-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* 发展远景部分 */
+        .vision-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: #2c5f2d;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .vision-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .vision-card {
+            background: #f8fff8;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #97bc62;
+        }
+
+        .vision-card h3 {
+            color: #2c5f2d;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .vision-card p {
+            color: #666;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        /* 时间轴部分 */
+        .timeline-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #97bc62;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background: #f8fff8;
+            border-radius: 12px;
+            border: 2px solid #97bc62;
+        }
+
+        .timeline-year {
+            color: #2c5f2d;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            color: #2c5f2d;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .timeline-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 技术路线图部分 */
+        .tech-roadmap-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .tech-card {
+            background: #f8fff8;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #97bc62;
+            text-align: center;
+        }
+
+        .tech-icon {
+            font-size: 40px;
+            color: #2c5f2d;
+            margin-bottom: 20px;
+        }
+
+        .tech-title {
+            color: #2c5f2d;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .tech-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 社会价值部分 */
+        .value-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .value-card {
+            background: #f8fff8;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #97bc62;
+        }
+
+        .value-title {
+            color: #2c5f2d;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .value-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .value-item {
+            color: #666;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .value-item::before {
+            content: '✓';
+            color: #2c5f2d;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <div class="nav-bar">
+        <div class="nav-container">
+            <a href="首页.html" class="nav-logo">
+                🌲 森林单木目标检测
+            </a>
+            <div class="nav-links">
+                <a href="首页.html" class="nav-link">首页</a>
+                <a href="图片检测.html" class="nav-link">图片检测</a>
+                <a href="算法对比.html" class="nav-link">算法对比</a>
+                <a href="林场地图.html" class="nav-link">林场地图</a>
+                <a href="政策解读.html" class="nav-link">政策解读</a>
+                <a href="发展方向.html" class="nav-link">发展方向</a>
+                <a href="https://yuanqi.tencent.com/agent/jOoj7nGdYJoo" class="nav-link">AI问答</a>
+    
+            </div>
+        </div>
+    </div>
+
+    <div class="content-container">
+        <!-- 发展远景部分 -->
+        <section class="vision-section">
+            <h2 class="section-title">发展远景</h2>
+            <div class="vision-content">
+                <div class="vision-card">
+                    <h3>技术愿景</h3>
+                    <p>打造全球领先的森林资源智能管理平台，通过深度学习、物联网和大数据技术的深度融合，实现森林资源的精准监测、智能分析和科学决策。</p>
+                </div>
+                <div class="vision-card">
+                    <h3>生态愿景</h3>
+                    <p>构建"数字森林"生态系统，推动森林资源管理从传统模式向智能化、精细化、可持续化转型，为全球生态文明建设贡献中国智慧。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 时间轴部分 -->
+        <section class="timeline-section">
+            <h2 class="section-title">发展路线图</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2025</div>
+                        <h3 class="timeline-title">技术升级阶段</h3>
+                        <p class="timeline-description">完成算法优化，提升检测精度；建立基础数据库，实现数据标准化；开发移动端应用，提升用户体验。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2026</div>
+                        <h3 class="timeline-title">平台扩展阶段</h3>
+                        <p class="timeline-description">整合多源数据，构建综合管理平台；开发智能分析模块，提供决策支持；建立用户反馈机制，持续优化系统。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2027</div>
+                        <h3 class="timeline-title">智能升级阶段</h3>
+                        <p class="timeline-description">引入边缘计算，提升实时处理能力；开发预测模型，实现趋势分析；建立知识图谱，提供智能决策。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2028-2030</div>
+                        <h3 class="timeline-title">生态价值实现阶段</h3>
+                        <p class="timeline-description">构建完整生态系统，实现多方共赢；推动碳汇交易，创造经济价值；建立国际合作，推广中国方案。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术路线图部分 -->
+        <section class="tech-roadmap-section">
+            <h2 class="section-title">技术路线图</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">🤖</div>
+                    <h3 class="tech-title">人工智能</h3>
+                    <p class="tech-description">深度学习算法优化、模型轻量化、边缘计算部署、知识图谱构建</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🌐</div>
+                    <h3 class="tech-title">物联网</h3>
+                    <p class="tech-description">传感器网络建设、数据实时采集、设备智能管理、边缘计算节点</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📊</div>
+                    <h3 class="tech-title">大数据</h3>
+                    <p class="tech-description">数据标准化、智能分析、可视化展示、预测模型构建</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 社会价值部分 -->
+        <section class="value-section">
+            <h2 class="section-title">社会价值</h2>
+            <div class="value-grid">
+                <div class="value-card">
+                    <h3 class="value-title">政府层面</h3>
+                    <ul class="value-list">
+                        <li class="value-item">提升森林资源管理效率</li>
+                        <li class="value-item">支持科学决策制定</li>
+                        <li class="value-item">推动生态文明建设</li>
+                        <li class="value-item">促进碳汇经济发展</li>
+                    </ul>
+                </div>
+                <div class="value-card">
+                    <h3 class="value-title">企业层面</h3>
+                    <ul class="value-list">
+                        <li class="value-item">降低管理成本</li>
+                        <li class="value-item">提升经营效益</li>
+                        <li class="value-item">创造新的商业模式</li>
+                        <li class="value-item">增强市场竞争力</li>
+                    </ul>
+                </div>
+                <div class="value-card">
+                    <h3 class="value-title">科研层面</h3>
+                    <ul class="value-list">
+                        <li class="value-item">提供研究数据支持</li>
+                        <li class="value-item">促进技术创新</li>
+                        <li class="value-item">推动学科交叉融合</li>
+                        <li class="value-item">培养专业人才</li>
+                    </ul>
+                </div>
+                <div class="value-card">
+                    <h3 class="value-title">公众层面</h3>
+                    <ul class="value-list">
+                        <li class="value-item">增强生态保护意识</li>
+                        <li class="value-item">提供参与平台</li>
+                        <li class="value-item">创造就业机会</li>
+                        <li class="value-item">提升生活质量</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>

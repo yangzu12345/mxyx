@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录页面</title>
+  <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+
+<body>
+  <div class="box">
+    <h2>登录界面</h2>
+    <!-- 返回首页按钮 -->
+    <div class="back-home">
+      <button id="backHomeBtn">返回首页</button>
+    </div>
+    <form id="loginForm">
+      <div class="input-box">
+        <label for="username">账号</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="input-box">
+        <label for="password">密码</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="input-box">
+        <label>用户类型</label>
+        <select name="userType" id="userType" required>
+          <option value="admin">管理员</option>
+          <option value="employee" selected>员工</option>
+        </select>
+      </div>
+      <div class="btn-box">
+        <a href="忘记密码.html">忘记密码</a>
+        <div>
+          <button type="submit">登录</button>
+          <button id="registerBtn" type="button">注册</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // 返回首页按钮事件
+    document.getElementById('backHomeBtn').addEventListener('click', () => {
+      window.location.href = '首页.html';  // 假设首页是 index.html
+    });
+
+    // 表单提交事件监听器
+    document.getElementById("loginForm").onsubmit = function (event) {
+      event.preventDefault();
+
+      // 获取输入值
+      const username = document.querySelector('#username').value;
+      const password = document.querySelector('#password').value;
+      const userType = document.querySelector('#userType').value;
+
+      // 基本验证
+      if (!username || !password) {
+        alert("请填写所有字段");
+        return;
+      }
+
+      // 向后台发送登录请求
+      fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password, role: userType }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          localStorage.setItem('token', data.token);
+          // 根据用户角色跳转
+          if (data.role === 'admin') {
+            window.location.href = '/admin.html';
+          } else {
+            window.location.href = '/employee.html';
+          }
+        })
+        .catch(error => {
+          console.error('错误:', error);
+          alert("登录请求失败，请稍后再试");
+        });
+    };
+
+    // 注册按钮点击事件
+    document.getElementById('registerBtn').addEventListener('click', () => {
+      window.location.href = '注册页面.html';
+    });
+  </script>
+</body>
+
+</html>

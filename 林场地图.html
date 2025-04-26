@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>林场地图</title>
+    <!-- 引入资源 -->
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <link rel="stylesheet" href="./CSS/index.css">
+
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: "1a10f8f7cd10345c567260ccaae174f8",
+        };
+    </script>
+    <script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=2.0&key=3cc80ebe7165e17a776d23fe5e1914a4&plugin=AMap.GeoJSON&plugin=AMap.Driving"></script>
+    <script src="./js/store.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c5f2d;
+            --secondary-color: #97bc62;
+            --background: #f0f8f0;
+        }
+
+        /* 基础样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--background);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏样式 */
+        .nav-bar {
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--background);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 地图相关样式 */
+        .map-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+        }
+
+        #container {
+            flex: 1;
+            height: calc(100vh - 70px);
+        }
+
+        /* 林场列表样式 */
+        #forest-list {
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            height: calc(100vh - 70px);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .forest-list-header {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-bottom: 1px solid #ddd;
+            background-color: #f8fff8;
+        }
+
+        .forest-list-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .forest-list-item:hover {
+            background-color: #f8fff8;
+            transform: translateX(5px);
+        }
+
+        .forest-list-item h3 {
+            margin: 0 0 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .forest-list-item p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <div class="nav-bar">
+        <div class="nav-container">
+            <a href="首页.html" class="nav-logo">
+                🌲 森林单木目标检测
+            </a>
+            <div class="nav-links">
+                <a href="首页.html" class="nav-link">首页</a>
+                <a href="林场地图.html" class="nav-link active">林场地图</a>
+                <a href="图片检测.html" class="nav-link">图片检测</a>
+                <a href="算法对比.html" class="nav-link">算法对比</a>
+                <a href="政策解读.html" class="nav-link">政策解读</a>
+                <a href="发展方向.html" class="nav-link">发展方向</a>
+                <a href="https://yuanqi.tencent.com/agent/jOoj7nGdYJoo" class="nav-link">AI问答</a>
+    
+            </div>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <div id="forest-list">
+            <div class="forest-list-header">林场列表</div>
+            <div class="forest-list-content">
+                <!-- 林场信息将动态生成 -->
+            </div>
+        </div>
+        <div id="container"></div>
+    </div>
+
+    <div class="container">
+        <script type="text/javascript">
+            // 创建地图对象
+            const map = new AMap.Map("container", {
+                viewMode: '3D', // 默认使用 3D 模式
+                zoom: 5, // 地图级别
+                center: [105.397428, 32.90923], // 地图中心点
+                pitch: 45
+            });
+
+            // 使用控件
+            AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.HawkEye', 'AMap.MapType', 'AMap.ControlBar', 'AMap.MoveAnimation'], function () {
+                var toolbar = new AMap.ToolBar({
+                    position: {
+                        top: '200px',
+                        right: '20px',
+                    }
+                }); // 缩放工具条实例化
+                var scale = new AMap.Scale();
+                var hawkeye = new AMap.HawkEye();
+                var maptype = new AMap.MapType();
+                var controlbar = new AMap.ControlBar();
+
+                map.addControl(toolbar); // 添加控件
+                map.addControl(scale);
+                map.addControl(hawkeye);
+                map.addControl(maptype);
+                map.addControl(controlbar);
+            });
+
+            // 林场位置数据及介绍
+            const forests = [
+                {
+                    name: '黑龙江省大兴安岭地区漠河县西林吉林业局古莲林场',
+                    position: [122.566111, 53.004722],
+                    iconUrl: './img/1.png',
+                    description: '位于大兴安岭深处，是中国最北端的林场之一，以原始森林和丰富的动植物资源著称。'
+                },
+                {
+                    name: '长白山温带落叶针阔混交林林场',
+                    position: [126.642464, 45.756967],
+                    iconUrl: './img/2.jpg',
+                    description: '长白山林场是中国东北地区的重要生态保护区，拥有丰富的温带森林生态系统。'
+                },
+                {
+                    name: '南京林业大学下蜀林场',
+                    position: [119.218001, 32.120048],
+                    iconUrl: './img/3.jpg',
+                    description: '下蜀林场是南京林业大学的实验林场，主要用于教学和科研活动。'
+                },
+                {
+                    name: '河北省塞罕坝机械林场',
+                    position: [116.683333, 41.933333],
+                    iconUrl: './img/4.jpg',
+                    description: '塞罕坝林场是中国北方著名的生态修复工程，经过几十年的努力，从荒漠变成了绿洲。'
+                },
+                {
+                    name: '内蒙古自治区浑善达克沙地林场',
+                    position: [113.116667, 43.850000],
+                    iconUrl: './img/5.jpg',
+                    description: '位于浑善达克沙地，是防风固沙的重要林场。'
+                },
+                {
+                    name: '青海省湟水流域林场',
+                    position: [101.783333, 36.616667],
+                    iconUrl: './img/6.jpg',
+                    description: '湟水流域林场是青海重要的生态保护区，对维持当地生态平衡具有重要意义。'
+                },
+                {
+                    name: '广西壮族自治区国有七坡林场',
+                    position: [108.383333, 22.783333],
+                    iconUrl: './img/7.jpg',
+                    description: '七坡林场是广西重要的国有林场，以亚热带常绿阔叶林为主。'
+                },
+                {
+                    name: '云南省西双版纳傣族自治州林场',
+                    position: [100.800000, 22.020000],
+                    iconUrl: './img/8.jpg',
+                    description: '西双版纳林场是中国热带雨林的重要代表，拥有丰富的生物多样性。'
+                },
+                {
+                    name: '西藏自治区林芝地区林场',
+                    position: [94.370000, 29.680000],
+                    iconUrl: './img/10.jpg',
+                    description: '林芝林场位于西藏东南部，是重要的生态保护区域。'
+                },
+                {
+                    name: '茂县暖温带落叶针叶混交林林场',
+                    position: [103.823557, 36.058039],
+                    iconUrl: './img/11.jpg',
+                    description: '茂县林场位于四川北部，是暖温带落叶针叶混交林的重要区域。'
+                },
+                {
+                    name: '哀牢山亚热带常绿阔叶林林场',
+                    position: [101.712251, 25.040609],
+                    iconUrl: './img/12.jpg',
+                    description: '哀牢山林场是中国西南地区重要的亚热带常绿阔叶林保护区。'
+                },
+                {
+                    name: '鼎湖山亚热带常绿针阔混交林林场',
+                    position: [113.280637, 23.125178],
+                    iconUrl: './img/13.jpg',
+                    description: '鼎湖山林场是中国南方重要的生态保护区，以亚热带常绿针阔混交林为主。'
+                }
+            ];
+
+            // 添加林场标注
+            forests.forEach(forest => {
+                const marker = new AMap.Marker({
+                    position: forest.position,
+                    title: forest.name,
+                    map: map,
+                    cursor: 'pointer',
+                    icon: new AMap.Icon({
+                        size: new AMap.Size(30, 40),
+                        image: forest.iconUrl,
+                        imageSize: new AMap.Size(30, 40)
+                    }),
+                    label: {
+                        content: forest.name,
+                        offset: getLabelOffset(forest.position),
+                        direction: 'right',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            backgroundColor: 'rgba(0,0,0,0.6)',
+                            padding: '5px',
+                            borderRadius: '5px'
+                        }
+                    }
+                });
+
+                // 点击标注放大到该位置
+                marker.on('click', function () {
+                    map.setZoomAndCenter(10, forest.position);
+                });
+            });
+
+            // 动态调整标签偏移量
+            function getLabelOffset(position) {
+                const [lng, lat] = position;
+                if (lng < 110) {
+                    return new AMap.Pixel(20, -10);
+                } else if (lng < 120) {
+                    return new AMap.Pixel(40, -20);
+                } else {
+                    return new AMap.Pixel(60, -30);
+                }
+            }
+
+            // 地图缩放时动态调整标签偏移量
+            map.on('zoomend', function () {
+                forests.forEach(forest => {
+                    const marker = map.getMarker(forest.name);
+                    if (marker) {
+                        marker.setLabel({
+                            offset: getLabelOffset(forest.position)
+                        });
+                    }
+                });
+            });
+
+            // 生成林场列表
+            const forestListContent = document.querySelector('.forest-list-content');
+            forests.forEach(forest => {
+                const listItem = document.createElement('div');
+                listItem.className = 'forest-list-item';
+                listItem.innerHTML = `
+                    <h3>${forest.name}</h3>
+                    <p>${forest.description}</p>
+                `;
+                listItem.onclick = () => {
+                    map.setZoomAndCenter(10, forest.position); // 点击列表项时跳转到对应位置
+                };
+                forestListContent.appendChild(listItem);
+            });
+        </script>
+    </div>
+</body>
+
+</html>

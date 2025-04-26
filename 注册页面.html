@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册页面</title>
+  <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+
+<body>
+  <div class="box">
+    <h2>用户注册</h2>
+    <div class="back-home">
+      <button id="backHomeBtn">返回首页</button>
+    </div>
+    <form id="registerForm">
+      <div class="input-box">
+        <label>用户名</label>
+        <input type="text" name="username" required>
+      </div>
+      <div class="input-box">
+        <label>邮箱</label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="input-box">
+        <label>密码</label>
+        <input type="password" name="password" required minlength="6">
+      </div>
+      <div class="input-box">
+        <label>确认密码</label>
+        <input type="password" name="confirmPassword" required>
+      </div>
+      <div class="btn-box">
+        <a href="登录页面.html">已有账号？立即登录</a>
+        <button type="submit">立即注册</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('backHomeBtn').addEventListener('click', () => {
+        window.location.href = '首页.html';  // 假设首页是 index.html
+    });
+    // 表单提交处理
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      // 前端验证
+      if (data.password !== data.confirmPassword) {
+        alert('两次输入的密码不一致');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert('注册成功，即将跳转到登录页面');
+          window.location.href = 'login.html';
+        } else {
+          alert(result.message || '注册失败');
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        alert('服务器连接异常');
+      }
+    });
+  </script>
+</body>
+
+</html>

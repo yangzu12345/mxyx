@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>忘记密码</title>
+  <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+
+<body>
+  <div class="box">
+    <h2>找回密码</h2>
+    <div class="back-home">
+      <button id="backHomeBtn">返回首页</button>
+    </div>
+    <form id="passwordResetForm">
+      <div class="input-box">
+        <label for="email">注册邮箱</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="btn-box">
+        <a href="登录页面.html">返回登录</a>
+        <button type="submit">发送重置邮件</button>
+      </div>
+    </form>
+    <div id="message" class="hidden">已发送重置说明到您的邮箱，请查收！</div>
+  </div>
+
+  <script>
+    document.getElementById('backHomeBtn').addEventListener('click', () => {
+        window.location.href = '首页.html';  // 假设首页是 index.html
+    });
+    document.getElementById('passwordResetForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+
+      if (!email) {
+        alert('请输入注册邮箱');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          document.getElementById('message').classList.remove('hidden');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 3000);
+        } else {
+          alert(result.message || '发送失败，请稍后重试');
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        alert('服务器连接异常');
+      }
+    });
+  </script>
+</body>
+
+</html>
